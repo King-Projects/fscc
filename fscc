@@ -14,7 +14,7 @@ apx1="/apex/com.android.art/javalib"
 apx2="/apex/com.android.runtime/javalib"
 fscc_file_list=""
 fscc_log="/data/media/0/ktsr/fscc.log"
-ver="1.0.0"
+ver="1.0.1"
 
 log_i() {
 	echo "[$(date +%T)]: [*] $1" >>"$fscc_log"
@@ -40,6 +40,20 @@ notif_end() { su -lp 2000 -c "cmd notification post -S bigtext -t 'FSCC is execu
 	log_e "No root permissions. Exiting..."
 	exit 1
 }
+
+[[ "$(command -v busybox)" ]] && {
+	total_ram=$(busybox free -m | awk '/Mem:/{print $2}')
+	total_ram_kb=$(grep [0-9] /proc/meminfo | awk '/kB/{print $2}' | head -1)
+	avail_ram=$(busybox free -m | awk '/Mem:/{print $7}')
+} || {
+	total_ram=$(free -m | awk '/Mem:/{print $2}')
+	total_ram_kb=$(grep [0-9] /proc/meminfo | awk '/kB/{print $2}' | head -1)
+	avail_ram=$(free -m | awk '/Mem:/{print $7}')
+}
+
+sdk=$(getprop ro.build.version.sdk)
+[[ "$sdk" == "" ]] && sdk=$(getprop ro.vendor.build.version.sdk)
+[[ "$sdk" == "" ]] && sdk=$(getprop ro.vndk.version)
 
 # $1:apk_path $return:oat_path
 # OPSystemUI/OPSystemUI.apk -> OPSystemUI/oat

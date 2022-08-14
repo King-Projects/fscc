@@ -32,8 +32,7 @@ echo ""
 
 echo "Zipping ${blink}FSCC-$v..."
 
-zip -0 -r9 -ll "FSCC-$v.zip" . -x *.git* -x *.txt -x cleantrash -x mod-util.sh -x adjshield -x fscache-ctrl -x *.yml -x kingd -x ktsrmenu -x kingtweaks -x gameoptd -x libcommon.sh -x libktsr.sh -x kcal.sh -x build.sh
-
+zip -0 -r9 -ll "FSCC-$v.zip" . -x *.git* -x fscache-ctrl -x fscc -x build.sh -x _config.yml
 mv -f "FSCC-$v.zip" ../out
 
 exit=$(date +%s)
