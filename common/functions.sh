@@ -40,11 +40,11 @@ device_check() {
 	done
 	prop=$(echo "$1" | tr '[:upper:]' '[:lower:]')
 	for i in /system /vendor /odm /product; do
-		[[ -f "$i"/build.prop ]] && {
+		[[ -f "$i/build.prop" ]] && {
 			for j in "ro.product.$type" "ro.build.$type" "ro.product.vendor.$type" "ro.vendor.product.$type"; do
 				[[ "$(sed -n "s/^$j=//p" "$i/build.prop" 2>/dev/null | head -n 1 | tr '[:upper:]' '[:lower:]')" == "$prop" ]] && return 0
 			done
-			[[ "$type" == "device" ]] && [[ "$(sed -n "s/^"ro.build.product"=//p" "$i"/build.prop 2>/dev/null | head -n 1 | tr '[:upper:]' '[:lower:]')" == "$prop" ]] && return 0
+			[[ "$type" == "device" ]] && [[ "$(sed -n "s/^"ro.build.product"=//p" "$i/build.prop" 2>/dev/null | head -n 1 | tr '[:upper:]' '[:lower:]')" == "$prop" ]] && return 0
 		}
 	done
 }
@@ -73,7 +73,7 @@ cp_ch() {
 	"$FOL" && OFILES=$(find "$SRC" -type f 2>/dev/null)
 	[[ -z "$3" ]] && PERM=0644 || PERM="$3"
 	case "$DEST" in
-		$TMPDIR/* | $MODULEROOT/* | $NVBASE/modules/$MODID/*) BAK=false ;;
+		"$TMPDIR"/* | "$MODULEROOT"/* | "$NVBASE/modules/$MODID"/*) BAK=false ;;
 	esac
 	for OFILE in "$OFILES"; do
 		"$FOL" && {
@@ -94,13 +94,13 @@ install_script() {
 	case "$1" in
 		-l)
 			shift
-			INPATH="$NVBASE"/service.d
+			INPATH="$NVBASE/service.d"
 			;;
 		-p)
 			shift
-			INPATH="$NVBASE"/post-fs-data.d
+			INPATH="$NVBASE/post-fs-data.d"
 			;;
-		*) INPATH="$NVBASE"/service.d ;;
+		*) INPATH="$NVBASE/service.d" ;;
 	esac
 	[[ "$(grep "#!/system/bin/sh" "$1")" ]] || sed -i "1i #!/system/bin/sh" "$1"
 	for i in "MODPATH" "LIBDIR" "MODID" "INFO" "MODDIR"; do
@@ -119,23 +119,23 @@ install_script() {
 
 prop_process() {
 	sed -i -e "/^#/d" -e "/^ *$/d" "$1"
-	[[ -f "$MODPATH"/system.prop ]] || mktouch "$MODPATH"/system.prop
+	[[ -f "$MODPATH/system.prop" ]] || mktouch "$MODPATH/system.prop"
 	while read LINE; do
-		echo "$LINE" >>"$MODPATH"/system.prop
+		echo "$LINE" >>"$MODPATH/system.prop"
 	done <"$1"
 }
 
 # Credits
 ui_print ""
-ui_print "****************************************************"
-ui_print "*   MMT Extended by Zackptg5 @ XDA                 *"
-ui_print "*   Modified by pedrozzz0 @ GitHub to King Tweaks™ *"
-ui_print "****************************************************"
+ui_print "*************************************"
+ui_print "*   MMT Extended by Zackptg5 @ XDA  *"
+ui_print "*   Modified by pedrozzz0 @ GitHub  *"
+ui_print "*************************************"	
 ui_print ""
 
 # Check for min/max api version
-[[ -z "$MINAPI" ]] || { [[ "$API" -lt "$MINAPI" ]] && abort "[!] Your system API of ${API} is less than the minimum api of ${MINAPI}! Aborting!"; }
-[[ -z "$MAXAPI" ]] || { [[ "$API" -gt "$MAXAPI" ]] && abort "[!] Your system API of ${API} is greater than the maximum api of ${MAXAPI}! Aborting!"; }
+[[ -z "$MINAPI" ]] || { [[ "$API" -lt "$MINAPI" ]] && abort "[!] Your system API of $API is less than the minimum api of $MINAPI! Aborting!"; }
+[[ -z "$MAXAPI" ]] || { [[ "$API" -gt "$MAXAPI" ]] && abort "[!] Your system API of $API is greater than the maximum api of $MAXAPI! Aborting!"; }
 
 # Set variables
 [[ -z "$ARCH32" ]] && ARCH32=$(echo "$ARCH" | cut -c-3)
@@ -156,7 +156,7 @@ ORIGDIR="$MAGISKTMP/mirror"
 	ui_print "[*] Only uninstall is supported in recovery"
 	ui_print "    Uninstalling!"
 	touch "$MODPATH/remove"
-	[[ -s "$INFO" ]] && install_script "$MODPATH"/uninstall.sh || rm -f "$INFO" "$MODPATH"/uninstall.sh
+	[[ -s "$INFO" ]] && install_script "$MODPATH/uninstall.sh" || rm -f "$INFO" "$MODPATH/uninstall.sh"
 	recovery_cleanup
 	cleanup
 	rm -rf "$NVBASE/modules_update/$MODID" "$TMPDIR" 2>/dev/null
@@ -172,9 +172,9 @@ ORIGDIR="$MAGISKTMP/mirror"
 }
 
 # Extract files
-ui_print "[*] Extracting King Tweaks Reborn files..."
+ui_print "[*] Extracting FSCC files..."
 unzip -o "$ZIPFILE" -x 'META-INF/*' 'common/functions.sh' -d "$MODPATH" >&2
-[[ -f "$MODPATH/common/addon.tar.xz" ]] && tar -xf "$MODPATH/common/addon.tar.xz" -C "$MODPATH"/common 2>/dev/null
+[[ -f "$MODPATH/common/addon.tar.xz" ]] && tar -xf "$MODPATH/common/addon.tar.xz" -C "$MODPATH/common" 2>/dev/null
 
 # Run addons
 [[ "$(ls -A "$MODPATH"/common/addon/*/install.sh 2>/dev/null)" ]] && {
@@ -201,7 +201,7 @@ ui_print "[*] Removing old files..."
 }
 
 # Install process
-ui_print "[*] Installing King Tweaks Reborn..."
+ui_print "[*] Installing FSCC..."
 
 [[ -f "$MODPATH/common/install.sh" ]] && . "$MODPATH/common/install.sh"
 
@@ -213,24 +213,24 @@ for i in $(find "$MODPATH" -type f -name *.sh -o -name *.prop -o -name *.rule); 
 		[[ "$(tail -1 "$i")" ]] && echo "" >>"$i"
 	} || continue
 	case "$i" in
-		"$MODPATH"/service.sh) install_script -l "$i" ;;
-		"$MODPATH"/post-fs-data.sh) install_script -p "$i" ;;
-		"$MODPATH"/uninstall.sh) [[ -s "$INFO" ]] || [[ "$(head -1 "$MODPATH"/uninstall.sh)" != "# Don't modify anything after this" ]] && install_script "$MODPATH"/uninstall.sh || rm -f "$INFO" "$MODPATH"/uninstall.sh ;;
+		"$MODPATH/service.sh") install_script -l "$i" ;;
+		"$MODPATH/post-fs-data.sh") install_script -p "$i" ;;
+		"$MODPATH/uninstall.sh") [[ -s "$INFO" ]] || [[ "$(head -1 "$MODPATH/uninstall.sh")" != "# Don't modify anything after this" ]] && install_script "$MODPATH/uninstall.sh" || rm -f "$INFO" "$MODPATH"/uninstall.sh ;;
 	esac
 done
 
 "$IS64BIT" || for i in "$(find "$MODPATH/system" -type d -name "lib64")"; do rm -rf "$i" 2>/dev/null; done
-[[ -d "/system/priv-app" ]] || mv -f "${MODPATH}/system/priv-app" "${MODPATH}/system/app" 2>/dev/null
-[[ -d "/system/xbin" ]] || mv -f "${MODPATH}/system/xbin" "${MODPATH}/system/bin" 2>/dev/null
+[[ -d "/system/priv-app" ]] || mv -f "$MODPATH/system/priv-app" "$MODPATH/system/app" 2>/dev/null
+[[ -d "/system/xbin" ]] || mv -f "$MODPATH/system/xbin" "$MODPATH/system/bin" 2>/dev/null
 "$DYNLIB" && {
 	for FILE in $(find "$MODPATH"/system/lib* -type f 2>/dev/null | sed "s|""$MODPATH""/system/||"); do
 		[[ -s "$MODPATH"/system/"$FILE" ]] || continue
 		case "$FILE" in
 			lib*/modules/*) continue ;;
 		esac
-		mkdir -p "$(dirname "$MODPATH"/system/vendor/"$FILE")"
-		mv -f "$MODPATH"/system/"$FILE" "$MODPATH"/system/vendor/"$FILE"
-		[[ "$(ls -A $(dirname "$MODPATH"/system/"$FILE"))" ]] || rm -rf "$(dirname "$MODPATH"/system/"$FILE")"
+		mkdir -p "$(dirname "$MODPATH/system/vendor/$FILE")"
+		mv -f "$MODPATH/system/$FILE" "$MODPATH/system/vendor/$FILE"
+		[[ "$(ls -A $(dirname "$MODPATH/system/$FILE"))" ]] || rm -rf "$(dirname "$MODPATH/system/$FILE")"
 	done
 	# Delete empty lib folders (busybox find doesn't have this capability)
 	toybox find "$MODPATH"/system/lib* -type d -empty -delete >/dev/null 2>&1

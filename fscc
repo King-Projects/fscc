@@ -14,6 +14,7 @@ apx1="/apex/com.android.art/javalib"
 apx2="/apex/com.android.runtime/javalib"
 fscc_file_list=""
 fscc_log="/data/media/0/ktsr/fscc.log"
+ver="1.0.0"
 
 log_i() {
 	echo "[$(date +%T)]: [*] $1" >>"$fscc_log"
@@ -167,4 +168,8 @@ fscc_add_apex_lib "bouncycastle.jar"
 }
 fscc_stop
 fscc_start
+log_i "FSCC - Filesystem optimizer
+Version: $ver
+Status: $(fscc_status)
+"
 notif_end
