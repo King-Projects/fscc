@@ -1,5 +1,4 @@
 #!/system/bin/sh
-# KTSR™ by Pedro (pedrozzz0 @ GitHub)
 # Credits: Ktweak, by Draco (tytydraco @ GitHub), LSpeed, qti-mem-opt & Uperf, by Matt Yang (yc9559 @ CoolApk) and Pandora's Box, by Eight (dlwlrma123 @ GitHub)
 # If you wanna use the code as part of your project, please maintain the credits to it's respectives authors
 
@@ -14,10 +13,21 @@ apx1="/apex/com.android.art/javalib"
 apx2="/apex/com.android.runtime/javalib"
 fscc_file_list=""
 fscc_log="/data/media/0/ktsr/fscc.log"
-ver="1.0.1"
+ver="1.0.3"
+
+# Check for root permissions and bail if not granted
+[[ "$(id -u)" != "0" ]] && {
+	log_e "No root permissions. Exiting..."
+	exit 1
+}
+
+[[ -d "/data/adb/modules/KTSR" ]] && { 
+log_e "KTSR found, exiting..."
+exit 1
+}
 
 log_i() {
-	echo "[$(date +%T)]: [*] $1" >>"$fscc_log"
+	echo "[$(date +%T)]: [*] $1" >"$fscc_log"
 	echo "" >>"$fscc_log"
 }
 
@@ -34,12 +44,6 @@ log_e() {
 notif_start() { su -lp 2000 -c "cmd notification post -S bigtext -t 'FSCC is executing' tag 'FSCC is running...'" >/dev/null 2>&1; }
 
 notif_end() { su -lp 2000 -c "cmd notification post -S bigtext -t 'FSCC is executing' tag 'FSCC pinned libs successfully!'" >/dev/null 2>&1; }
-
-# Check for root permissions and bail if not granted
-[[ "$(id -u)" != "0" ]] && {
-	log_e "No root permissions. Exiting..."
-	exit 1
-}
 
 [[ "$(command -v busybox)" ]] && {
 	total_ram=$(busybox free -m | awk '/Mem:/{print $2}')
