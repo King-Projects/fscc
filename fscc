@@ -13,7 +13,7 @@ apx1="/apex/com.android.art/javalib"
 apx2="/apex/com.android.runtime/javalib"
 fscc_file_list=""
 fscc_log="/data/media/0/ktsr/fscc.log"
-ver="1.0.3"
+ver="1.0.4"
 
 # Check for root permissions and bail if not granted
 [[ "$(id -u)" != "0" ]] && {
@@ -21,7 +21,7 @@ ver="1.0.3"
 	exit 1
 }
 
-[[ -d "/data/adb/modules/KTSR" ]] && { 
+[[ -d "/data/adb/modules/KTSR/" ]] && { 
 log_e "KTSR found, exiting..."
 exit 1
 }
@@ -37,7 +37,7 @@ log_d() {
 }
 
 log_e() {
-	echo "[!] $1" >>"$fscc_log"
+	echo "[!] $1" >"$fscc_log"
 	echo "[!] $1"
 }
 
