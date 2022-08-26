@@ -6,6 +6,7 @@
 # Variables
 #####################
 sys_frm="/system/framework"
+sys_bin="/system/bin"
 sys_lib="/system/lib64"
 vdr_lib="/vendor/lib64"
 dvk="/data/dalvik-cache"
@@ -22,8 +23,8 @@ ver="1.0.4"
 }
 
 [[ -d "/data/adb/modules/KTSR/" ]] && { 
-log_e "KTSR found, exiting..."
-exit 1
+	log_e "KTSR found, exiting..."
+	exit 1
 }
 
 log_i() {
@@ -42,7 +43,6 @@ log_e() {
 }
 
 notif_start() { su -lp 2000 -c "cmd notification post -S bigtext -t 'FSCC is executing' tag 'FSCC is running...'" >/dev/null 2>&1; }
-
 notif_end() { su -lp 2000 -c "cmd notification post -S bigtext -t 'FSCC is executing' tag 'FSCC pinned libs successfully!'" >/dev/null 2>&1; }
 
 [[ "$(command -v busybox)" ]] && {
@@ -129,7 +129,6 @@ fscc_add_apex_lib() { fscc_add_obj "$(find /apex -name "$1" | head -1)"; }
 # After appending fscc_file_list
 # Multiple parameters, cannot be warped by ""
 fscc_start() { ${modpath}system/bin/fscache-ctrl -fdlb0 $fscc_file_list; }
-
 fscc_stop() { killall -9 fscache-ctrl; }
 
 # Return:status
@@ -146,8 +145,14 @@ fscc_add_obj "$sys_frm/qcnvitems.jar"
 fscc_add_obj "$sys_frm/oat"
 fscc_add_obj "$sys_frm/arm64"
 fscc_add_obj "$sys_frm/miui-okhttp.jar"
-fscc_add_obj "/system/bin/surfaceflinger"
-fscc_add_obj "/system/bin/servicemanager"
+
+fscc_add_obj "$sys_bin/surfaceflinger"
+fscc_add_obj "$sys_bin/servicemanager"
+fscc_add_obj "$sys_bin/linker"
+fscc_add_obj "$sys_bin/linker64"
+fscc_add_obj "$sys_bin/iorapd"
+fscc_add_obj "$sys_bin/sqlite3"
+
 fscc_add_obj "$sys_lib/libbinder.so"
 fscc_add_obj "$sys_lib/libgui.so"
 fscc_add_obj "$sys_lib/libsurfaceflinger.so"
@@ -172,22 +177,30 @@ fscc_add_obj "$sys_lib/libc++.so"
 fscc_add_obj "$sys_lib/libstdc++.so"
 fscc_add_obj "$sys_lib/libcrypto.so"
 fscc_add_obj "$sys_lib/libblas.so"
+fscc_add_obj "$sys_lib/libz.so"
+fscc_add_obj "$sys_lib/libasyncio.so"
+fscc_add_obj "$sys_lib/libappfuse.so"
+
 fscc_add_obj "$vdr_lib/libssc.so"
 fscc_add_obj "$vdr_lib/libgsl.so"
 fscc_add_obj "$vdr_lib/sensors.ssc.so"
 fscc_add_obj "$vdr_lib/libCB.so"
 fscc_add_obj "$vdr_lib/librs_adreno.so"
+
 fscc_add_apex_lib "okhttp.jar"
 fscc_add_apex_lib "bouncycastle.jar"
+
 # Do not pin too many files on low memory devices
 [[ "$total_ram" -ge "2048" ]] && {
 	fscc_add_apk "com.android.systemui"
 	fscc_add_dex "com.android.systemui"
 }
+
 [[ "$total_ram" -ge "4096" ]] && {
 	fscc_add_app_home
 	fscc_add_app_ime
 }
+
 fscc_stop
 fscc_start
 log_i "FSCC - Filesystem optimizer
