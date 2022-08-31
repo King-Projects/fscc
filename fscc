@@ -14,7 +14,7 @@ apx1="/apex/com.android.art/javalib"
 apx2="/apex/com.android.runtime/javalib"
 fscc_file_list=""
 fscc_log="/data/media/0/ktsr/fscc.log"
-ver="1.0.4"
+ver="1.0.5"
 
 # Check for root permissions and bail if not granted
 [[ "$(id -u)" != "0" ]] && {
@@ -180,8 +180,13 @@ fscc_add_obj "$sys_lib/libstdc++.so"
 fscc_add_obj "$sys_lib/libcrypto.so"
 fscc_add_obj "$sys_lib/libblas.so"
 fscc_add_obj "$sys_lib/libz.so"
+fscc_add_obj "$sys_lib/liblzma.so"
+fscc_add_obj "$sys_lib/libpng.so"
 fscc_add_obj "$sys_lib/libasyncio.so"
 fscc_add_obj "$sys_lib/libappfuse.so"
+fscc_add_obj "$sys_lib/libsqlite.so"
+fscc_add_obj "$sys_lib/libziparchive.so"
+fscc_add_obj "$sys_lib/libz.so"
 
 fscc_add_obj "$vdr_lib/libssc.so"
 fscc_add_obj "$vdr_lib/libgsl.so"
