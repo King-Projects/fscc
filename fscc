@@ -186,7 +186,6 @@ fscc_add_obj "$sys_lib/libasyncio.so"
 fscc_add_obj "$sys_lib/libappfuse.so"
 fscc_add_obj "$sys_lib/libsqlite.so"
 fscc_add_obj "$sys_lib/libziparchive.so"
-fscc_add_obj "$sys_lib/libz.so"
 
 fscc_add_obj "$vdr_lib/libssc.so"
 fscc_add_obj "$vdr_lib/libgsl.so"
