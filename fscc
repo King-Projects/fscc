@@ -210,7 +210,6 @@ fscc_add_apex_lib "linker64"
 fscc_add_apex_lib "dalvikvm32"
 fscc_add_apex_lib "dalvikvm64"
 fscc_add_apex_lib "dex2oat"
-fscc_add_apex_lib "dexdump"
 fscc_add_apex_lib "dexlist"
 fscc_add_apex_lib "dexoptanalyzer"
 
