@@ -140,12 +140,15 @@ fscc_status() {
 
 # Run FSCC (similar to PinnerService, Mlock(Unevictable) 200~350MB)
 notif_start
+
+# System framework JARs
 fscc_add_obj "$sys_frm/telephony-common.jar"
 fscc_add_obj "$sys_frm/qcnvitems.jar"
 fscc_add_obj "$sys_frm/oat"
 fscc_add_obj "$sys_frm/arm64"
 fscc_add_obj "$sys_frm/miui-okhttp.jar"
 
+# Vendor binaries ("programs")
 fscc_add_obj "$sys_bin/surfaceflinger"
 fscc_add_obj "$sys_bin/servicemanager"
 fscc_add_obj "$sys_bin/linker"
@@ -153,6 +156,7 @@ fscc_add_obj "$sys_bin/linker64"
 fscc_add_obj "$sys_bin/iorapd"
 fscc_add_obj "$sys_bin/sqlite3"
 
+# System libaries (shared binaries)
 fscc_add_obj "$sys_lib/libbinder.so"
 fscc_add_obj "$sys_lib/libgui.so"
 fscc_add_obj "$sys_lib/libsurfaceflinger.so"
@@ -187,21 +191,63 @@ fscc_add_obj "$sys_lib/libappfuse.so"
 fscc_add_obj "$sys_lib/libsqlite.so"
 fscc_add_obj "$sys_lib/libziparchive.so"
 
+# Vendor libaries (shared binaries)
 fscc_add_obj "$vdr_lib/libssc.so"
 fscc_add_obj "$vdr_lib/libgsl.so"
 fscc_add_obj "$vdr_lib/sensors.ssc.so"
 fscc_add_obj "$vdr_lib/libCB.so"
 fscc_add_obj "$vdr_lib/librs_adreno.so"
 
+# APEX JARs
+# Avoid pinning too much since JARs can be very big.
 fscc_add_apex_lib "okhttp.jar"
 fscc_add_apex_lib "bouncycastle.jar"
+fscc_add_apex_lib "core-libart.jar"
 
-# Do not pin too many files on low memory devices
+# APEX libraries (shared binaries)
+fscc_add_apex_lib "linker"
+fscc_add_apex_lib "linker64"
+fscc_add_apex_lib "dalvikvm32"
+fscc_add_apex_lib "dalvikvm64"
+fscc_add_apex_lib "dex2oat"
+fscc_add_apex_lib "dexdump"
+fscc_add_apex_lib "dexlist"
+fscc_add_apex_lib "dexoptanalyzer"
+
+# Pin Bionic's libraries (shared binaries) only if we have a bigger RAM available.
+[[ "$total_ram" -ge "2048" ]] && {
+	fscc_add_apex_lib "bionic/libc.so"
+	fscc_add_apex_lib "bionic/libm.so"
+	fscc_add_apex_lib "bionic/libdl.so"
+}
+
+# Do not pin SystemUI if we have less than (actual) 2GB of RAM.
 [[ "$total_ram" -ge "2048" ]] && {
 	fscc_add_apk "com.android.systemui"
 	fscc_add_dex "com.android.systemui"
 }
 
+# Pin APEX libraries if we have enough RAM (at least 4GB),
+# On low RAM devices will just be waste of RAM.
+[[ "$total_ram" -ge "4096" ]] && {
+	fscc_add_apex_lib "libcrypto.so"
+	fscc_add_apex_lib "libz.so"
+	fscc_add_apex_lib "liblzma.so"
+	fscc_add_apex_lib "libart.so"
+	fscc_add_apex_lib "libc++.so"
+	fscc_add_apex_lib "libopenjdk.so"
+	fscc_add_apex_lib "libopenjdkvm.so"
+	fscc_add_apex_lib "libopenjdkvmti.so"
+	fscc_add_apex_lib "libdexfile.so"
+	fscc_add_apex_lib "libjavacrypto.so"
+	fscc_add_apex_lib "libart-compiler.so"
+	fscc_add_apex_lib "libart-dexlayout.so"
+	fscc_add_apex_lib "libssl.so"
+	fscc_add_apex_lib "libziparchive.so"
+}
+
+# Pin launcher only if we really have enough RAM for it,
+# Can be quite heavy pin it.
 [[ "$total_ram" -ge "4096" ]] && {
 	fscc_add_app_home
 	fscc_add_app_ime
