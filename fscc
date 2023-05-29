@@ -17,7 +17,7 @@ apx1="/apex/com.android.art/javalib"
 apx2="/apex/com.android.runtime/javalib"
 fscc_file_list=""
 fscc_log="/data/media/0/ktsr/fscc.log"
-ver="1.1.1"
+ver="1.1.2"
 
 # Check for root permissions and bail if not granted
 [[ "$(id -u)" != "0" ]] && {
@@ -146,7 +146,7 @@ fscc_status() {
 fscc_add_obj "$sys_bin/surfaceflinger"
 [[ "$(getprop ro.bionic.arch)" == "arm64" ]] && fscc_add_obj "$sys_bin/linker64" || fscc_add_obj "$sys_bin/linker"
 
-# System libraries (shared binaries)
+# System libraries (shared objects)
 fscc_add_obj "$sys_lib/libbinder.so"
 fscc_add_obj "$sys_lib/libandroid_servers.so"
 fscc_add_obj "$sys_lib/libandroid_runtime.so"
@@ -155,13 +155,20 @@ fscc_add_obj "$sys_lib/libandroid.so"
 fscc_add_obj "$sys_lib/libhwui.so"
 fscc_add_obj "$sys_lib/libinput.so"
 fscc_add_obj "$sys_lib/libinputreader.so"
+fscc_add_obj "$sys_lib/libvulkan.so"
+fscc_add_obj "$sys_lib/libinputreader.so"
+fscc_add_obj "$sys_lib/libcameraservice.so"
 
-# Vendor libraries (shared binaries)
+# Vendor libraries (shared objects)
+fscc_add_obj "$vdr_lib/sensors.ssc.so"
+fscc_add_obj "$vdr_lib/libCB.so"
+fscc_add_obj "$vdr_lib/libgsl.so"
 fscc_add_obj "$vdr_lib/sensors.ssc.so"
 fscc_add_obj "$vdr_lib/egl/libGLESv2_adreno.so"
 fscc_add_obj "$vdr_lib/hw/vulkan.adreno.so"
-fscc_add_obj "$vdr_lib/libllvm-qgl.so"
-fscc_add_obj "$sys_lib/libgui_vendor.so"
+fscc_add_obj "$vdr_lib/libgui_vendor.so"
+fscc_add_obj "$vdr_lib/libgpudataproducer.so"
+fscc_add_obj "$vdr_lib/libdpps.so"
 
 # APEX JARs
 fscc_add_apex_lib "core-libart.jar"
