@@ -17,7 +17,8 @@ apx1="/apex/com.android.art/javalib"
 apx2="/apex/com.android.runtime/javalib"
 fscc_file_list=""
 fscc_log="/data/media/0/ktsr/fscc.log"
-ver="1.1.2"
+ver="1.1.3"
+api_level=$(getprop ro.vendor.build.version.sdk)
 
 # Check for root permissions and bail if not granted
 [[ "$(id -u)" != "0" ]] && {
@@ -182,6 +183,12 @@ fscc_add_apex_lib "dex2oat"
 [[ "$total_ram" -ge "2048" ]] && {
 	fscc_add_apk "com.android.systemui"
 	fscc_add_dex "com.android.systemui"
+}
+
+# Pin WebView for faster page loading times
+[[ "$total_ram" -ge "2048" ]] && [[ "$api_level" -lt "35" ]] && {
+	fscc_add_apk "com.google.android.webview"
+	fscc_add_dex "com.google.android.webview"
 }
 
 # Pin input method and camera libs only if we really have enough RAM for it
